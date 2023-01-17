@@ -4,6 +4,6 @@
 SELECT person.person_name, COUNT(movie_actor.movie_id) AS num_of_movies
 FROM person
 LEFT JOIN movie_actor ON person.person_id = movie_actor.actor_id
-WHERE person.person_name ilike 'George%' --ilike for case-insensitive 
-GROUP BY person.person_id
-ORDER BY person.person_name ASC; 
+WHERE person.person_name like 'George %' 
+GROUP BY person_id
+ORDER BY person_name ASC; 

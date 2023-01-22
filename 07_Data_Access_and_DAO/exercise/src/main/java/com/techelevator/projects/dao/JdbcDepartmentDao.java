@@ -18,28 +18,21 @@ public class JdbcDepartmentDao implements DepartmentDao {
 	public JdbcDepartmentDao(DataSource dataSource) {
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
-
+	//why would you use DataSource over using a DriverManager
 	@Override
 	public Department getDepartment(int id) {
 		//call or instantiate a new department object
-		Department department = null; //null accounts for null pointer exception
+		Department department = new Department();
 		//your sql code stored in a string
 		String sql = "SELECT department_id, name "
 				+ "FROM department " +
-				"WHERE name = ?;";
-
-		SqlRowSet results = jdbcTemplate.queryForRowSet(sql, id);
-		System.out.println(results);
-		if (results.next()) {
+				"WHERE department_id = ?;";
+		SqlRowSet results = jdbcTemplate.queryForRowSet(sql, id); //pass in id as parameter
+		if (results.next()) { //check if any results were returned, account for null(can we do this on line 25?)
 			department = mapRowToDepartment(results);
+		} else {
+			return null;
 		}
-		return department;
-	}
-
-	private Department mapRowToDepartment(SqlRowSet rowSet) {
-		Department department = new Department();
-		department.setName(rowSet.getString("name"));
-		department.setId(rowSet.getInt("department_id"));
 		return department;
 	}
 
@@ -57,8 +50,26 @@ public class JdbcDepartmentDao implements DepartmentDao {
 	}
 
 	@Override
-	public void updateDepartment(Department updatedDepartment) {
-
-
+	public void updateDepartment(Department updatedDepartment) { //void, doesn't need to return results
+		//update the department name
+		String sql = "UPDATE department " +
+				"SET name = ? " +
+				"WHERE department_id = ?;";
+		jdbcTemplate.update(sql, updatedDepartment.getName(),
+				updatedDepartment.getId());
+		//check if rows were affected
+		int rowsAffected = jdbcTemplate.update(sql, updatedDepartment.getName(),
+				updatedDepartment.getId());
+		if (rowsAffected > 0) {
+			System.out.println("Department updated successfully");
+		} else {
+			System.out.println("Department update failed");
+		}
+	}
+	private Department mapRowToDepartment(SqlRowSet rowSet) {
+		Department department = new Department();
+		department.setName(rowSet.getString("name"));
+		department.setId(rowSet.getInt("department_id"));
+		return department;
 	}
 }

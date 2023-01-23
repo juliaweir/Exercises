@@ -14,28 +14,21 @@ import com.techelevator.projects.model.Project;
 public class JdbcProjectDao implements ProjectDao {
 
 	private final JdbcTemplate jdbcTemplate;
-
 	public JdbcProjectDao(DataSource dataSource) {
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
-
 	@Override
 	public Project getProject(int projectId) {
-		Project project = new Project();
+		Project project = null;
 		String sql = "SELECT project_id, name, to_date, from_date " +
 				"FROM project " +
 				"WHERE project_id = ?;" ;
 		SqlRowSet results = jdbcTemplate.queryForRowSet(sql, projectId);
-		if (results.next()) {
+		while (results.next()) {
 			project = mapRowToProject(results);
-		}
-		else {
-			System.out.println("No projects found");
-			return  null;
 		}
 		return project;
 	}
-
 	@Override
 	public List<Project> getAllProjects() {
 		List<Project> allProjects = new ArrayList<>();
@@ -51,11 +44,11 @@ public class JdbcProjectDao implements ProjectDao {
 	@Override
 	public Project createProject(Project newProject) {
 		String sql = "INSERT INTO project(project_id, name, from_date, to_date) " +
-				"VALUES (DEFAULT, ? , ? , ?)"; //will autogenerate next key in proj_id sequence
-		int id = jdbcTemplate.update(sql, newProject.getName(),
+				"VALUES (DEFAULT, ? , ? , ?)";
+		int newId = jdbcTemplate.update(sql, newProject.getName(),
 						newProject.getFromDate(),
 						newProject.getToDate());
-		newProject.setId(id);
+		newProject.setId(newId);
 		return newProject;
 	}
 

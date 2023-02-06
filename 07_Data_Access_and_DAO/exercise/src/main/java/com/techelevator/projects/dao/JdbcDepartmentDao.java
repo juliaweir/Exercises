@@ -22,7 +22,7 @@ public class JdbcDepartmentDao implements DepartmentDao {
 	@Override
 	public Department getDepartment(int id) {
 		//call or instantiate a new department object
-		Department department = new Department();
+		Department department;
 		//your sql code stored in a string
 		String sql = "SELECT department_id, name "
 				+ "FROM department " +

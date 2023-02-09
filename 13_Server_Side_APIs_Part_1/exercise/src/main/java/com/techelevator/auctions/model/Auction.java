@@ -11,9 +11,13 @@ public class Auction {
     public Auction() {
     }
 
+    public Auction(String title){
+        this.title = title;
+    }
     /*
      * When you are creating a new auction you don't have the id
      */
+
     public Auction(String title, String description, String user, double currentBid) {
         this.title = title;
         this.description = description;

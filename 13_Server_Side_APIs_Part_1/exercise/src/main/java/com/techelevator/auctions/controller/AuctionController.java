@@ -16,35 +16,29 @@ public class AuctionController {
     public AuctionController() {
         this.dao = new MemoryAuctionDao();
     }
-
-    //Step Two: Implement the `list()` method
     @RequestMapping(path = "/auctions", method = RequestMethod.GET)
-    public List<Auction> auctions() {
+    public List<Auction> auctions(@RequestParam(name="title_like", defaultValue="") String title,
+                        @RequestParam(name="currentBid_lte", defaultValue="0") double bid) {
+        if(!title.equals("") && bid > 0) {
+            return dao.searchByTitleAndPrice(title, bid);
+         } else if (bid > 0) {
+            return dao.searchByPrice(bid);
+        }  else if (!title.equals("")) {
+            return dao.searchByTitle(title);
+        }
         return dao.list();
     }
+   
 // Step Three: Implement the `get()` action
 
     @RequestMapping(path = "/auctions/{id}", method = RequestMethod.GET)
     public Auction get(@PathVariable int id) {
         return dao.get(id);
     }
-
+  
     // Step Four:    Implement the `create()` action
     @RequestMapping(path = "/auctions", method = RequestMethod.POST)
     public Auction create(@RequestBody Auction auction) {
         return dao.create(auction);
         }
-
-
-    //Step Five: Add searching by title
-    @RequestMapping(path = "/auctions?title_like=", method = RequestMethod.GET)
-    public List<Auction> listOfAuctions(@RequestParam(value = "title_like", defaultValue = "")String title){
-        return dao.searchByTitle(title);
-
-    }
-
-   // }
-    //Step Six: Add searching by price
-
-    //Step Seven: Search by title and price
 }

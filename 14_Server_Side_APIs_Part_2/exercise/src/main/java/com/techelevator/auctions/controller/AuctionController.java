@@ -2,6 +2,9 @@ package com.techelevator.auctions.controller;
 
 import java.util.List;
 
+import javax.annotation.security.PermitAll;
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.techelevator.auctions.dao.AuctionDao;
 import com.techelevator.auctions.model.Auction;
 import org.springframework.web.server.ResponseStatusException;
-
+@PermitAll
 @RestController
 @RequestMapping("/auctions")
 public class AuctionController {
@@ -40,19 +43,34 @@ public class AuctionController {
     }
 
     @RequestMapping(path = "/{id}", method = RequestMethod.GET)
-    public Auction get(@PathVariable int id) {
+    public Auction get(@Valid@PathVariable int id) {
         Auction auction = dao.get(id);
         if (auction == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Auction Not Found");
         } else {
-            return dao.get(id);
+            return auction;
         }
     }
 
+    @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping( path = "", method = RequestMethod.POST)
-    public Auction create(@RequestBody Auction auction) {
+    public Auction create(@Valid @RequestBody Auction auction) {
         return dao.create(auction);
     }
+    
+    @RequestMapping(path = "/{id}", method = RequestMethod.PUT)
+    public Auction update(@Valid @RequestBody Auction auction, @PathVariable int id) {
+         Auction updatedAuction = dao.update(auction, id);
+        if (updatedAuction == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Auction not found");
+        } else {
+            return updatedAuction;
+        }
+    }
 
-
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @RequestMapping(path = "/{id}", method = RequestMethod.DELETE)
+    public void delete(@PathVariable int id) {
+        dao.delete(id);
+    }
 }

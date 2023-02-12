@@ -1,12 +1,19 @@
 package com.techelevator.locations.model;
 
+import javax.validation.constraints.NotBlank;
+
 public class Location {
 
     private int id;
+    @NotBlank(message = "Name is required")
     private String name;
+    @NotBlank(message = "Address is required")
     private String address;
+    @NotBlank(message = "City is required")
     private String city;
+    @NotBlank(message = "State is required")
     private String state;
+    @NotBlank(message = "Zip is required")
     private String zip;
 
     public Location() {

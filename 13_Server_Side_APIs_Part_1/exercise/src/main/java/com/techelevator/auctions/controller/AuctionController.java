@@ -4,6 +4,7 @@ import com.techelevator.auctions.dao.AuctionDao;
 import com.techelevator.auctions.dao.MemoryAuctionDao;
 import com.techelevator.auctions.model.Auction;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -33,7 +34,12 @@ public class AuctionController {
 
     @RequestMapping(path = "/auctions/{id}", method = RequestMethod.GET)
     public Auction get(@PathVariable int id) {
-        return dao.get(id);
+        Auction auction = dao.get(id);
+            if  (auction == null) {
+                throw new ResponseStatusException(null);
+                } else {
+                    return auction;
+            }
     }
   
     // Step Four:    Implement the `create()` action

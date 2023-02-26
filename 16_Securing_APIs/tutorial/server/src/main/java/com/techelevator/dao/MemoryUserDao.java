@@ -34,7 +34,8 @@ public class MemoryUserDao implements UserDao {
         Resource resource = loadUsers();
         if (resource.exists()) {
             try {
-                Stream<String> lines = Files.lines(resource.getFile().toPath());
+                Stream<String> lines = Files.lines(resource.getFile().toPath()); //open stream, resource leak 
+                //(is it still a leak if it is in a try catch block?)
                 lines.forEach(line -> {
                     String[] userDetails = line.split(",");
                     users.add(new User((Long.parseLong(userDetails[0])), userDetails[1], userDetails[2], userDetails[3], Boolean.parseBoolean(userDetails[4])));

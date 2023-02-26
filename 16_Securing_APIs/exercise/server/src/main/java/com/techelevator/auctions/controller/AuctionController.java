@@ -4,6 +4,11 @@ import com.techelevator.auctions.dao.AuctionDao;
 import com.techelevator.auctions.dao.MemoryAuctionDao;
 import com.techelevator.auctions.model.Auction;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -12,6 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/auctions")
+@PreAuthorize("isAuthenticated()")
 public class AuctionController {
 
     private AuctionDao dao;
@@ -19,8 +25,10 @@ public class AuctionController {
     public AuctionController() {
         this.dao = new MemoryAuctionDao();
     }
+   
 
     @RequestMapping(path = "", method = RequestMethod.GET)
+    @Secured("permitAll")
     public List<Auction> list(@RequestParam(defaultValue = "") String title_like, @RequestParam(defaultValue = "0") double currentBid_lte) {
 
         if (!title_like.equals("")) {
@@ -43,12 +51,15 @@ public class AuctionController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('CREATOR', 'ADMIN')")
     @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(path = "", method = RequestMethod.POST)
+    @Secured({"ROLE_CREATOR", "ROLE_ADMIN"})
     public Auction create(@Valid @RequestBody Auction auction) {
         return dao.create(auction);
     }
 
+    @PreAuthorize("hasAnyRole('CREATOR', 'ADMIN')")
     @RequestMapping(path = "/{id}", method = RequestMethod.PUT)
     public Auction update(@Valid @RequestBody Auction auction, @PathVariable int id) {
         Auction updatedAuction = dao.update(auction, id);
@@ -59,6 +70,7 @@ public class AuctionController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @RequestMapping(path = "/{id}", method = RequestMethod.DELETE)
     public void delete(@PathVariable int id) {
@@ -67,7 +79,10 @@ public class AuctionController {
 
     @RequestMapping(path = "/whoami")
     public String whoAmI() {
-        return "";
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        return auth.getName();
     }
 
 }
+

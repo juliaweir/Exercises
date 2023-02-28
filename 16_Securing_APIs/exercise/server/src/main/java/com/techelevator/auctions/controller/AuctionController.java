@@ -27,8 +27,8 @@ public class AuctionController {
     }
    
 
+    @PreAuthorize("permitAll()")
     @RequestMapping(path = "", method = RequestMethod.GET)
-    @Secured("permitAll")
     public List<Auction> list(@RequestParam(defaultValue = "") String title_like, @RequestParam(defaultValue = "0") double currentBid_lte) {
 
         if (!title_like.equals("")) {
